@@ -17,27 +17,29 @@ recipe:      Subject, activity, and type were combined and inserted into the fir
              All combinations of subject and activity were inserted into the first two columns of the
              averages_meanSD.txt file. Then subject and activity was used to subset and average the
              remaining 79 columns on each variable.
-             
+
              
              file:                   column:          source files:
              =====                   =======          ============
+             averages_meanSD.txt     subject          subject_test.txt, subject_train.txt
+                                     activity         activity_labels.txt, y_test.txt, y_train.txt
+                                     79 variables     features.txt, X_test, X_train
+                                     
              acc_gyro.txt            subject          subject_test.txt, subject_train.txt
                                      activity         activity_labels.txt, y_test.txt, y_train.txt
                                      type             test or train depending on file
                                      meas1..128       Inertial Signals/*.*  , 9 files test + 9 files train
                             
-             averages_meanSD.txt     subject          subject_test.txt, subject_train.txt
-                                     activity         activity_labels.txt, y_test.txt, y_train.txt
-                                     79 variables     features.txt, X_test, X_train
-                            
-             
-included files and foulder:
+included files:
 
 readme.md             -this file
 run_analysis.R        -R file to make acc_gyro.txt & meanSD.txt
-acc_gyro.txt          -combined accelerometer and gyro data
 meanSD.txt            -  means and SD
-UCI HAR Dataset/      - 28 raw source files
+
+uploaded/other:
+
+acc_gyro.txt          -combined accelerometer and gyro data uploaded to getdata-006
+UCI HAR Dataset/      - 28 raw source files, too large to include, see data source
 
 
 code book:   Below is a list of each column/variable and description:

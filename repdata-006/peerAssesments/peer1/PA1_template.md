@@ -94,6 +94,6 @@ xyplot(steps ~ interval|xday, data=imeans,layout=c(1,2),type="l",main="Steps vs 
 
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
 
-12. upload PA1_template.Rmd to github
+
 
 

@@ -1,0 +1,52 @@
+---
+title: "Quadratic Bezier Curve"
+author: "Ron Shillinglaw"
+date: "Friday, December 12, 2014"
+output: html_document
+---
+
+
+    The Bezier curve has many applications including computer fonts and graphics. 
+    
+    In 3D printing it is somtimes desirable to reproduce these curves. The curve must be converted to g codes that the printers can understand. This requires breaking the curve up into a series of arcs of circles. Since the printer knows its starting position it is only necessary to give the end point and radius of the arc. For instance if an arc ended at (3,3) with a 1 inch radius one could give the command "g02 x3 y3 r1" in the text file sent to the printer. The printer continues extruding plastic layer by layer in straight lines and arcs until the object is completed.
+
+Bezier Formula:
+B(t)=(1-t) [(1-t)P0+tP1]+t [(1-t)P1+tP2]
+
+Refer to: http://en.wikipedia.org/wiki/Bezier_curve for more information.
+
+build data
+---
+
+```{r}
+setwd("~/R/coursera/devdataprod-016/bezier")
+p0=c(2,2);p1=c(4,8);p2=c(8,5);t=0
+bt0=function(t){(1-t)*((1-t)*p0+t*p1)+
+                   t *((1-t)*p1+t*p2)}
+bt1=function(t){(1-t)^2*p0+2*(1-t)*t*p1+t^2*p2}
+bt2=function(t){(1-t)*(p1-p2)+2*t*(p2-p1)}
+npt=function(t){vbt0<<-bt0(t)
+                vbt1<<-bt1(t);vbt2<<-bt2(t)}
+npt(t)
+horiz=seq(0,1,.1)
+bcurve=data.frame(x=0,y=0)
+for(i in seq_along(horiz)){bcurve[i,1]=bt0(horiz[i])[1];bcurve[i,2]=bt0(horiz[i])[2]}
+
+plot_curve=function(){
+plot(bcurve,xlim=c(0,10),ylim=c(0,10),main="Bezier Simulation")
+lines(c(p0[1],p1[1],p2[1]),c(p0[2],p1[2],p2[2]),type="l")
+points(p0[1],p0[2],col="red")
+points(p1[1],p1[2],col="green")
+points(p2[1],p2[2],col="blue")}
+
+plot_curve()
+x=2
+library(manipulate)
+#manipulate(plot_curve(),x=slider(0,10),
+#   y=slider(10,20),
+#pt=picker("red"=1,"green"=2,"blue"=3))
+
+```
+
+
+

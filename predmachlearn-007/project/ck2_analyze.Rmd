@@ -1,0 +1,76 @@
+---
+title: "Dumbbell Weight lifting Method Analysis"
+author: "Ron Shillinglaw"
+date: "Friday, November 23, 2014"
+output: html_document
+---
+Synopsis:
+
+Six individuals wore accelerometers on their forearm, waist and upper arm. An additional sensor was located on one end of the hand dumbbell. The data was supplied by:
+<http://groupware.les.inf.puc-rio.br/har>
+Five weight lifting procedures were executed: "ABCDE". The purpose of this paper is to predict these five lifting methods (ABCDE) from the 20 unknown test cases based on the 19622 rows of training data.
+
+Data cleanup:
+
+The first thing is to get rid of unused columns. The graph shows the six volunteers doing the five lifts and how different they are. There is something wrong with the accelerometer data. If that were really just positive acceleration the dumbells would be going through the roof. I suspect it is displacement data. If average gravity acceleration were added in it would be the same for all individuals. Whatever it is if it describes our motion we can use it. There is not enough resolution to see each up down motion clearly but you get the idea and how different individuals are lifting. Intuitatively if you continue to positively accelerate your car you just keep going faster you have to have some negative acceleration to get back to your starting point.
+
+```{r}
+
+setwd("~/R/coursera/predmachlearn-007/project/ck2")
+train.all<-read.csv("train.csv",na.strings=c("NA",""," "))
+test.all <-read.csv("test.csv",na.strings=c("NA",""," "))
+train.all=train.all[,-1]; test.all=test.all[,-1]
+
+train.ord=train.all[order(train.all[2],train.all[,60],train.all[,3],train.all[,4]),]
+plot(train.ord[,"total_accel_dumbbell"],col=train.ord[,60],pch=20,main="Six individuals lifting dumbbells, methods:ABCDE",type="b")
+legend(18000,55,legend=c(" ","A","B","C","D","E"),col=0:4,lty=c(1,1),cex=.5)
+```
+
+We can train our data with rpart and get an idea of the misclassification error on the training data.
+
+```{r}
+
+library(rpart)
+
+model=rpart(classe~.,data=train.all[,c(2,8:60)])
+(answer=predict(model,test.all,type="class"))
+r.error=(table(predict(model,train.all,type="class"))/table(train.all[,60]))-1
+
+
+```
+The misclassification error is `r (print(sprintf("%3.2f",sd(r.error)*100))) ` %.
+That is a little more error than we would like lets try svm classification to see if we can do better.
+
+
+```{r}
+
+library(e1071)
+(t.svm=svm(classe~.,data=train.all[,8:60]))
+(t.ans=predict(t.svm,test.all))
+table(t.ans==answer) # 6 false, 14 true
+
+(r.error2=(table(predict(t.svm,train.all)))/(table(train.all[,60]))-1)
+
+(sd(r.error2))
+
+```
+
+##Conclusions:
+The svm is much better 6% versus 15% misclassification and 14 of the 20 were the same.
+It is interesting that both of these are better than the 21% error rate shown in the confusion matrix in the HAR link above.
+
+```{r echo=F,eval=F}
+
+setwd("~/R/coursera/predmachlearn-007/project/submit1")
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+# pml_write_files(t.ans) # 20/20 ok
+
+
+```
+
